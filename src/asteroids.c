@@ -1,4 +1,4 @@
-#define MAX_ASTEROIDS 10;
+#define MAX_ASTEROIDS 4
 #define LEFT_S 0
 #define RIGHT_S 1
 #define DOWN_S 2
@@ -50,7 +50,7 @@ typedef struct Bullets{
 
 vc_vector* bullets; //= vc_vector_create(0, sizeof(Bullet), NULL);
 vc_vector* asteroids;
-Asteroid asteroids_arr[2];
+Asteroid asteroids_arr[MAX_ASTEROIDS];
 static Asteroid test_a;
 static int RAND_SEED = 9;
 long score;
@@ -362,7 +362,7 @@ void update_asteroids()
     // }
   // }
 //
-  for(unsigned i =0; i < 2; i++)
+  for(unsigned i =0; i < MAX_ASTEROIDS; i++)
   {
     int velx = asteroids_arr[i].velx;
     int vely = asteroids_arr[i].vely;
@@ -442,7 +442,7 @@ void update_display()
     // nokia_lcd_set_cursor(test_a.x, test_a.y);
     // nokia_lcd_write_custom(11,2);
   // }
-  for(unsigned i = 0; i < 2; i++)
+  for(unsigned i = 0; i < MAX_ASTEROIDS; i++)
   {
     if(asteroids_arr[i].visible == 0)
       continue;

@@ -103,7 +103,7 @@ int main(void)
   // nokia_lcd_write_custom(11,2);
 //
   // nokia_lcd_render();
-  TimerSet(findGCD(game.period, findGCD(input_t.period, asteroid_t.period)));
+  TimerSet(1);
   TimerOn();
   while(1)
   {
