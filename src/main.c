@@ -58,8 +58,8 @@ int main(void)
   player.x=45;
   player.y=35;
   player.orientation = 3; 
-  b.visible = 0;
-  // bullets = vc_vector_create(0, sizeof(Bullet), NULL);
+  // b.visible = 0;
+  bullets = vc_vector_create(0, sizeof(Bullet), NULL);
   // LCD_draw_custom(DOWNR_S,10,10);
   TimerSet(findGCD(game.period, input_t.period));
   TimerOn();

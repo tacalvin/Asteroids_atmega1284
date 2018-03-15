@@ -44,7 +44,7 @@ typedef struct Bullets{
   unsigned char visible;
 } Bullet;
 
-static Bullet b;
+// static Bullet b;
 
 vc_vector* bullets; //= vc_vector_create(0, sizeof(Bullet), NULL);
 
@@ -163,13 +163,16 @@ void update_player(unsigned int input)
         }
         // if(player.x + offsetx || player.y+offsety < LIMIT)
 
-        if(b.visible)
-          return;
+        // if(b.visible)
+          // return;
+        Bullet b;
         b.x = player.x;
         b.y = player.y;
         b.vely = vely;
         b.velx = velx;
         b.visible = 1;
+
+        vc_vector_push_back(bullets, &b);
 
 
       }
@@ -229,64 +232,66 @@ void update_player(unsigned int input)
 
 void update_bullets()
 {
-  if(b.x + b.velx < 0 || b.x + b.velx > 84)
-    {
-      b.visible = 0;
-      b.velx = 1;
-      b.vely = 1;
-      b.x=0;
-      b.y=0;
-    }
-    else if(b.y + b.vely < 0 || b.y + b.vely > 48)
-    {
-      b.visible = 0;
-      b.velx = 1;
-      b.vely = 1;
-      b.x=0;
-      b.y=0;
-    }
-    else {
-      b.x += b.velx;
-      b.y += b.vely;
-    }
-  
-
-
-  // int idx =0;
-  // vc_vector* idxs = vc_vector_create(0, sizeof(int), NULL);
-//
-  // for(void* i = vc_vector_begin(bullets);
-      // i != vc_vector_end(bullets);
-      // i = vc_vector_next(bullets, i),idx++)
-  // {
-    // int velx = (*(Bullet*)i).velx;
-    // int vely = (*(Bullet*)i).vely;
-//
-//
-    // int x = (*(Bullet*)i).x;
-    // int y = (*(Bullet*)i).y;
-//
-    // if(x + velx < 0 || x + velx > 84)
+  // if(b.x + b.velx < 0 || b.x + b.velx > 84)
     // {
-      // vc_vector_push_back(idxs, &i);
-      // continue;
+      // b.visible = 0;
+      // b.velx = 1;
+      // b.vely = 1;
+      // b.x=0;
+      // b.y=0;
     // }
-    // else if(y + vely < 0 || y + vely > 48)
+    // else if(b.y + b.vely < 0 || b.y + b.vely > 48)
     // {
-      // vc_vector_push_back(idxs, &i);
-      // continue;
+      // b.visible = 0;
+      // b.velx = 1;
+      // b.vely = 1;
+      // b.x=0;
+      // b.y=0;
     // }
     // else {
-      // (*(Bullet*)i).x += velx;
-      // (*(Bullet*)i).y += vely;
+      // b.x += b.velx;
+      // b.y += b.vely;
     // }
-  // }
-  // if(vc_vector_empty(idxs))
-  // {
-    // vc_vector_release(idxs);
-    // return;
-  // }
 //
+
+//
+  int idx =0;
+  vc_vector* idxs = vc_vector_create(0, sizeof(int), NULL);
+
+  for(void* i = vc_vector_begin(bullets);
+      i != vc_vector_end(bullets);
+      i = vc_vector_next(bullets, i),idx++)
+  {
+    int velx = (*(Bullet*)i).velx;
+    int vely = (*(Bullet*)i).vely;
+
+
+    int x = (*(Bullet*)i).x;
+    int y = (*(Bullet*)i).y;
+
+    if(x + velx < 0 || x + velx > 84)
+    {
+      // vc_vector_push_back(idxs, &i);
+      (*(Bullet*)i).visible = 0;
+      continue;
+    }
+    else if(y + vely < 0 || y + vely > 48)
+    {
+      // vc_vector_push_back(idxs, &i);
+      (*(Bullet*)i).visible = 0;
+      continue;
+    }
+    else {
+      (*(Bullet*)i).x += velx;
+      (*(Bullet*)i).y += vely;
+    }
+  }
+  if(vc_vector_empty(idxs))
+  {
+    vc_vector_release(idxs);
+    return;
+  }
+
   // for(void* i = vc_vector_begin(idxs);
       // i != vc_vector_end(idxs);
       // i = vc_vector_next(idxs, i))
@@ -305,18 +310,20 @@ void update_display()
 {
   nokia_lcd_clear();
   //iterate through all game objects and draw them
-  if(b.visible)
-  {
-    nokia_lcd_set_cursor(b.x, b.y);
-    nokia_lcd_write_custom(8,1);
-  }
-  // for(void* i = vc_vector_begin(bullets);
-      // i != vc_vector_end(bullets);
-      // i = vc_vector_next(bullets, i))
+  // if(b.visible)
   // {
-    // nokia_lcd_set_cursor((*(Bullet*)i).x, (*(Bullet*)i).y);
+    // nokia_lcd_set_cursor(b.x, b.y);
     // nokia_lcd_write_custom(8,1);
   // }
+  for(void* i = vc_vector_begin(bullets);
+      i != vc_vector_end(bullets);
+      i = vc_vector_next(bullets, i))
+  {
+    if((*(Bullet*)i).visible == 0)
+      continue;
+    nokia_lcd_set_cursor((*(Bullet*)i).x, (*(Bullet*)i).y);
+    nokia_lcd_write_custom(8,1);
+  }
 
   //draw player
   nokia_lcd_set_cursor(player.x,player.y);
