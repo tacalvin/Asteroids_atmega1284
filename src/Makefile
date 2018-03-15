@@ -13,7 +13,7 @@ build:
 		$(COMPILE) -c $(FILENAME).c snes.c lcd_display.c vc_vector.c
 			$(COMPILE) -o $(FILENAME).elf $(OBJS) 
 				avr-objcopy -j .text -j .data -O ihex $(FILENAME).elf $(FILENAME).hex
-					avr-size --format=avr --mcu=$(DEVICEG) $(FILENAME).elf
+					avr-size --format=avr -C --mcu=$(DEVICEG) $(FILENAME).elf
 
 upload:
 		avrdude -v -p $(DEVICE) -c $(PROGRAMMER) -b $(BAUD) -U flash:w:$(FILENAME).hex:i 

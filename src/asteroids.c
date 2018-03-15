@@ -8,11 +8,13 @@
 #define DOWNL_S 6
 #define UPR_S 7
 #include "vc_vector.h"
+#include <stdlib.h>
+#include <stdio.h>
 typedef struct Asteroids{
   //on scale from 0,1,2
   unsigned char size;
-  unsigned short x;
-  unsigned short y;
+  short x;
+  short y;
   int velx;
   int vely;
   unsigned char visible;
@@ -21,8 +23,8 @@ typedef struct Asteroids{
 enum ship_status {ALIVE, DEAD};
 
 typedef struct _player{
-  unsigned short x;
-  unsigned short y;
+  short x;
+  short y;
   int velx;
   int vely;
   int accy;
@@ -37,8 +39,8 @@ unsigned int input;
 
 
 typedef struct Bullets{
-  unsigned short x;
-  unsigned short y;
+  short x;
+  short y;
   int velx;
   int vely;
   unsigned char visible;
@@ -47,6 +49,11 @@ typedef struct Bullets{
 // static Bullet b;
 
 vc_vector* bullets; //= vc_vector_create(0, sizeof(Bullet), NULL);
+vc_vector* asteroids;
+Asteroid asteroids_arr[2];
+static Asteroid test_a;
+static int RAND_SEED = 9;
+long score;
 
 enum Asteroids_State {INIT, START_SCREEN, GAME, UPDATE, RESET, GAME_OVER}; 
 void update(unsigned int input);
@@ -58,7 +65,7 @@ unsigned int get_input();
 
 int asteroids_game(int game_state)
 {
-  PORTA = vc_vector_size(bullets); 
+  // PORTA = vc_vector_size(asteroids);
   switch (game_state) {
     case INIT:
       game_state = START_SCREEN;
@@ -145,12 +152,10 @@ void update_player(unsigned int input)
           case UP_S:
             velx = 0;
             vely = -1;
-            PORTA = 0xFF;
             break;
           case DOWN_S:
             velx = 0;
             vely = 1;
-            PORTA = 0xFF;
             break;
           case LEFT_S:
             velx = -1;
@@ -232,35 +237,10 @@ void update_player(unsigned int input)
 
 void update_bullets()
 {
-  // if(b.x + b.velx < 0 || b.x + b.velx > 84)
-    // {
-      // b.visible = 0;
-      // b.velx = 1;
-      // b.vely = 1;
-      // b.x=0;
-      // b.y=0;
-    // }
-    // else if(b.y + b.vely < 0 || b.y + b.vely > 48)
-    // {
-      // b.visible = 0;
-      // b.velx = 1;
-      // b.vely = 1;
-      // b.x=0;
-      // b.y=0;
-    // }
-    // else {
-      // b.x += b.velx;
-      // b.y += b.vely;
-    // }
-//
-
-//
-  int idx =0;
-  vc_vector* idxs = vc_vector_create(0, sizeof(int), NULL);
-
+  unsigned char all_off = 1;
   for(void* i = vc_vector_begin(bullets);
       i != vc_vector_end(bullets);
-      i = vc_vector_next(bullets, i),idx++)
+      i = vc_vector_next(bullets, i))
   {
     int velx = (*(Bullet*)i).velx;
     int vely = (*(Bullet*)i).vely;
@@ -282,13 +262,15 @@ void update_bullets()
       continue;
     }
     else {
+      all_off = 0;
       (*(Bullet*)i).x += velx;
       (*(Bullet*)i).y += vely;
     }
   }
-  if(vc_vector_empty(idxs))
+  if(all_off)
   {
-    vc_vector_release(idxs);
+    vc_vector_release(bullets);
+    bullets = vc_vector_create(0,sizeof(Bullet), NULL);
     return;
   }
 
@@ -301,10 +283,139 @@ void update_bullets()
   // vc_vector_release(idxs);
 }
 
+#define VEL_RANGE 3
+#define LOCX_RANGE 84
+#define LOCY_RANGE 48
+#define A_RAND 3
+#define C_RAND 2
+
+// void rand(int mod, int a, int c, int* seed)
+// {
+  // *seed = (a * (*seed) + c) % (*seed);
+// }
+
+//update on slower period as seprate sm
+int update_at(int state)
+{
+  update_asteroids();
+  return 1;
+}
 void update_asteroids()
 {
 
+  // if(test_a.visible == 0)
+  // {
+    // test_a.x =0;
+    // test_a.y =15;
+    // test_a.velx = 1;
+    // test_a.visible = 1;
+  // }
+  // else {
+    // test_a.x += test_a.velx;
+  // }
+  // return;
+//
+  // for(void* i = vc_vector_begin(asteroids);
+      // i != vc_vector_end(asteroids);
+      // i = vc_vector_next(asteroids, i))
+  // {
+    // int velx = (*(Asteroid*)i).velx;
+    // int vely = (*(Asteroid*)i).vely;
+//
+//
+    // int x = (*(Asteroid*)i).x;
+    // int y = (*(Asteroid*)i).y;
+    // if((*(Asteroid*)i).visible == 0)
+    // {
+        // if(rand() > .5)
+        // {
+          // (*(Asteroid*)i).velx = rand() % (VEL_RANGE + 1 - (-1 * VEL_RANGE)) +(-1*VEL_RANGE);
+          // (*(Asteroid*)i).vely = 0;
+        // }
+        // else {
+         // (*(Asteroid*)i).vely = rand() % (VEL_RANGE + 1 - (-1 * VEL_RANGE)) +(-1*VEL_RANGE);
+         // (*(Asteroid*)i).velx = 0;
+        // }
+        // (*(Asteroid*)i).x = rand()%LOCX_RANGE;
+        // (*(Asteroid*)i).y = rand()%LOCY_RANGE;
+        // (*(Asteroid*)i).visible = 1;
+    // }
+    // else if(x + velx < 0 )
+    // {
+      // (*(Asteroid*)i).x = 83;
+    // }
+    // else if(x + velx > 84)
+    // {
+      // (*(Asteroid*)i).x = 1;
+    // }
+    // else if(y + vely < 0)
+    // {
+      // (*(Asteroid*)i).y = 46;
+    // }
+    // else if(y + vely > 48)
+    // {
+      // (*(Asteroid*)i).y = 1;
+    // }
+    // else {
+      // (*(Asteroid*)i).x += velx;
+      // (*(Asteroid*)i).y += vely;
+    // }
+  // }
+//
+  for(unsigned i =0; i < 2; i++)
+  {
+    int velx = asteroids_arr[i].velx;
+    int vely = asteroids_arr[i].vely;
+
+
+    int x = asteroids_arr[i].x;
+    int y = asteroids_arr[i].y;
+    if(asteroids_arr[i].visible == 0)
+    {
+      if(rand() > .5)
+        {
+          asteroids_arr[i].velx = rand() % (VEL_RANGE + 1 - (-1 * VEL_RANGE)) +(-1*VEL_RANGE);
+          asteroids_arr[i].vely = 0;//rand() % (VEL_RANGE + 1 - (-1 * VEL_RANGE)) +(-1*VEL_RANGE);
+        }
+        else {
+         asteroids_arr[i].velx = rand() % (VEL_RANGE + 1 - (-1 * VEL_RANGE)) +(-1*VEL_RANGE);
+         asteroids_arr[i].vely = rand() % (VEL_RANGE + 1 - (-1 * VEL_RANGE)) +(-1*VEL_RANGE);
+        }
+        asteroids_arr[i].velx = 0;//rand() % (VEL_RANGE + 1 - (-1 * VEL_RANGE)) +(-1*VEL_RANGE);
+        asteroids_arr[i].vely = rand() % (VEL_RANGE + 1 - (-1 * VEL_RANGE)) +(-1*VEL_RANGE);
+
+        asteroids_arr[i].x = rand()%LOCX_RANGE;
+        asteroids_arr[i].y = rand()%LOCY_RANGE;
+        asteroids_arr[i].visible = 1;
+    }
+    else if(x + velx < 0 )
+    {
+      asteroids_arr[i].x = 83;
+    }
+    else if(x + velx > 84)
+    {
+      asteroids_arr[i].x = 0;
+    }
+    else if(y + vely < 0)
+    {
+      asteroids_arr[i].y = 47;
+    }
+    else if(y + vely > 48)
+    {
+      asteroids_arr[i].y = 0;
+    }
+    else {
+      asteroids_arr[i].x += velx;
+      asteroids_arr[i].y += vely;
+    }
+  }
+    // vc_vector* temp = asteroids;
+    // asteroids = vc_vector_create(0,sizeof(Asteroid), NULL);
+    // vc_vector_release(temp);
+    // spawn_asteroids();
+  return;
 }
+//
 
 void update_display()
 {
@@ -324,6 +435,30 @@ void update_display()
     nokia_lcd_set_cursor((*(Bullet*)i).x, (*(Bullet*)i).y);
     nokia_lcd_write_custom(8,1);
   }
+
+
+  // if(test_a.visible)
+  // {
+    // nokia_lcd_set_cursor(test_a.x, test_a.y);
+    // nokia_lcd_write_custom(11,2);
+  // }
+  for(unsigned i = 0; i < 2; i++)
+  {
+    if(asteroids_arr[i].visible == 0)
+      continue;
+    nokia_lcd_set_cursor(asteroids_arr[i].x, asteroids_arr[i].y);
+    nokia_lcd_write_custom(11,1);
+  }
+//
+  // for(void* i = vc_vector_begin(asteroids);
+      // i != vc_vector_end(asteroids);
+      // i = vc_vector_next(asteroids, i))
+  // {
+    // if((*(Asteroid*)i).visible == 0)
+      // continue;
+    // nokia_lcd_set_cursor((*(Asteroid*)i).x, (*(Asteroid*)i).y);
+    // nokia_lcd_write_custom(11,1);
+  // }
 
   //draw player
   nokia_lcd_set_cursor(player.x,player.y);
